@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Lora', serif;
+      margin: 0;
+      padding: 0;
+      background-color: white;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .navbar {
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #7a4e9f;
+    }
+
+    .navbar .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7a4e9f;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar li {
+      position: relative;
+    }
+
+    .navbar a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar a.active {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a:hover {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a::before,
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #7a4e9f;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .navbar a::before {
+      left: -10px;
+    }
+
+    .navbar a::after {
+      right: -10px;
+    }
+
+    .navbar a:hover::before,
+    .navbar a:hover::after {
+      opacity: 1;
+      box-shadow: 0 0 5px 1px #7a4e9f, 0 0 10px 2px #7a4e9f, 0 0 15px 3px #7a4e9f;
+    }
+
+    .profile-container {
+      padding: 30px;
+      max-width: 800px;
+      margin: 50px auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      opacity: 0;
+      transform: translateY(-50px);
+      transition: all 0.5s ease;
+    }
+
+    .profile-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .profile-container h2 {
+      text-align: center;
+      color: #7a4e9f;
+      margin-bottom: 20px;
+    }
+
+    .profile-field {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .profile-field label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .profile-field input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .profile-field input[readonly] {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+
+    .profile-actions {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .profile-actions button {
+      background-color: #7a4e9f;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .profile-actions button:hover {
+      background-color: #5a3474;
+    }
+
+    .profile-picture {
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .profile-picture img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #7a4e9f;
+    }
+
+    .change-password-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      display: none;
+    }
+
+    .change-password-modal.active {
+      display: block;
+    }
+
+    .change-password-modal h3 {
+      margin: 0 0 15px;
+      color: #7a4e9f;
+    }
+
+    .change-password-modal button {
+      background-color: #7a4e9f;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .password-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .change-password-modal button:hover {
+      background-color: #5a3474;
+    }
+    .password-container input {
+      padding-right: 30px;
+      width: 100%;  
+    }
+    .eye-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%; 
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 20px;
+    }*
+    .navbar .dropdown {
+      position: relative;
+    }
+
+    .navbar .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .navbar .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="particles-js"></div>
+    <div class="navbar">
+      <div class="logo">Teacher Dashboard</div>
+      <ul>
+        <li><a href="teacher.html">Home</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="condidates.html">Condidates</a></li>
+        <li><a href="communication.html">Communication</a></li>
+        <li class="dropdown">
+            <a href="profile.html" class="active">Profile</a>
+            <div class="dropdown-content">
+              <a href="../login/login.html">Logout</a>
+            </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="profile-container" :class="{ visible: containerVisible }">
+      <h2>Your Profile</h2>
+
+      <div class="profile-picture" @click="triggerProfilePictureUpload">
+        <img :src="profile.picture" alt="Profile Picture" />
+        <input type="file" @change="updateProfilePicture" ref="profilePictureInput" style="display: none;" />
+      </div>
+
+      <div class="profile-field">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" v-model="profile.firstName" readonly />
+      </div>
+
+      <div class="profile-field">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" v-model="profile.lastName" readonly />
+      </div>
+
+      <div class="profile-field">
+        <label for="email">Email:</label>
+        <input type="email" id="email" v-model="profile.email" />
+      </div>
+
+      <div class="profile-field">
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" v-model="profile.phone" />
+      </div>
+
+      <div class="profile-field">
+        <label for="address">Address:</label>
+        <input type="text" id="address" v-model="profile.address" />
+      </div>
+
+      <div class="profile-field">
+        <label for="domain">Domain:</label>
+        <input type="text" id="domain" v-model="profile.domain" />
+      </div>
+
+      <div class="profile-field">
+        <label for="password">Password:</label>
+        <div class="password-container">
+          <input 
+            :type="isPasswordVisible ? 'text' : 'password'" 
+            id="password" 
+            v-model="profile.password" 
+            readonly 
+            @click="showChangePasswordModal" 
+          />
+          <span 
+            class="eye-icon" 
+            @mouseenter="togglePasswordVisibility" 
+            @mouseleave="togglePasswordVisibility"
+          >
+            <i :class="isPasswordVisible ? 'fa fa-eye' : 'fa fa-eye-slash'"></i>
+          </span>
+        </div>
+      </div>
+      
+      <div class="profile-actions">
+        <a href="teacher.html">
+          <button @click="saveProfile">Save Changes</button>
+        </a>
+        <a href="teacher.html">
+          <button @click="cancelChanges">Cancel</button>
+        </a>
+      </div>
+      
+    </div>
+
+    <div class="change-password-modal" :class="{ active: isChangePasswordModalVisible }">
+      <h3>Change Password</h3>
+      <input type="password" placeholder="Enter New Password" v-model="newPassword" />
+      <input type="password" placeholder="Confirm New Password" v-model="confirmPassword" />
+      <button @click="changePassword">Confirm</button>
+      <button @click="closeChangePasswordModal">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: "#app",
+      data: {
+        containerVisible: false,
+        profile: {
+          picture: "https://via.placeholder.com/120",
+          firstName: "Benali",
+          lastName: "Mohamed",
+          email: "BenaliMohamed@univ-constantine2.dz",
+          phone: "0555555555",
+          address: "Ali mendjeli",
+          password: "YourPasswordHere",
+        },
+        isChangePasswordModalVisible: false,
+        newPassword: "",
+        confirmPassword: "",
+        isPasswordVisible: false, 
+      },
+      mounted() {
+        setTimeout(() => {
+          this.containerVisible = true;
+        }, 100);
+      },
+      methods: {
+        triggerProfilePictureUpload() {
+          this.$refs.profilePictureInput.click();
+        },
+        updateProfilePicture(event) {
+          const file = event.target.files[0];
+          if (file) {
+            this.profile.picture = URL.createObjectURL(file);
+          }
+        },
+        saveProfile() {
+          alert("Profile updated successfully!");
+        },
+        cancelChanges() {
+          window.location.reload();
+        },
+        showChangePasswordModal() {
+          this.isChangePasswordModalVisible = true;
+        },
+        closeChangePasswordModal() {
+          this.isChangePasswordModalVisible = false;
+          this.newPassword = "";
+          this.confirmPassword = "";
+        },
+        changePassword() {
+          if (this.newPassword === this.confirmPassword && this.newPassword) {
+            this.profile.password = this.newPassword; 
+            alert("Password changed successfully!");
+            this.closeChangePasswordModal();
+          } else {
+            alert("Passwords do not match or are empty!");
+          }
+        },
+        togglePasswordVisibility() {
+        this.isPasswordVisible = !this.isPasswordVisible;
+      }
+      },
+    });
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#7a4e9f' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: true },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: '#7a4e9f' },
+        move: { enable: true, speed: 3 }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: 'repulse' },
+          onclick: { enable: true, mode: 'push' }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

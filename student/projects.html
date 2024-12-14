@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'lora', serif;
+      margin: 0;
+      padding: 0;
+      background-color: white;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .navbar {
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #7a4e9f;
+    }
+
+    .navbar .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7a4e9f;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar li {
+      position: relative;
+    }
+
+    .navbar a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar a.active {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a:hover {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a::before,
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #7a4e9f;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .navbar a::before {
+      left: -10px;
+    }
+
+    .navbar a::after {
+      right: -10px;
+    }
+
+    .navbar a:hover::before,
+    .navbar a:hover::after {
+      opacity: 1;
+      box-shadow: 0 0 5px 1px #7a4e9f, 0 0 10px 2px #7a4e9f, 0 0 15px 3px #7a4e9f;
+    }
+
+    .navbar .dropdown {
+      position: relative;
+    }
+
+    .navbar .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .navbar .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .navbar .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      background-color: transparent;
+      z-index: 0;
+    }
+    .container h2{
+        color:#7a4e9f;
+    }
+    .left, .right {
+      width: 50%;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .list-item {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .list-item button {
+      background-color: #7a4e9f;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .list-item button:hover {
+      background-color: #5a3277;
+    }
+    .list-item h3:hover{
+       cursor: pointer;
+       text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+    .project-details {
+      display: none;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+    .project-details button{
+        border-radius: 5px;
+    }
+    .list-item button{
+        border-radius: 5px;
+    }
+    .project-details.open {
+      display: block;
+    }
+    .group-selection {
+  text-align: center;
+  margin: 20px 0;
+}
+.group-selection {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.group-selection button {
+  background-color: #7a4e9f;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.group-selection button:hover {
+  background-color: #5a3277;
+}
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Box */
+.modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+}
+
+/* Modal Heading */
+.modal h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+/* Select dropdown */
+.modal select {
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 80%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Input Fields */
+.modal input {
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 80%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Buttons */
+.modal button {
+  padding: 8px 15px;
+  margin-top: 10px;
+  border: none;
+  background-color: #7a4e9f;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+.modal button:hover {
+  background-color: #5a3277;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Group Members Section */
+.group-members {
+  margin-top: 20px;
+}
+
+.group-members h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.group-members ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.group-members li {
+  padding: 5px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="particles-js"></div>
+
+  <div class="navbar">
+    <div class="logo">Student Dashboard</div>
+    <ul>
+      <li><a href="student.html" >Home</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="communication.html">Communication <div class="notification-badge">3</div></a></li>
+      <li class="dropdown">
+        <a href="profile.html">Profile</a>
+        <div class="dropdown-content">
+          <a href="../login/login.html">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="group-selection">
+    <button @click="openModal">{{ groupMembers.length > 0 ? 'Show Members' : 'Form a group' }}</button>
+  </div>
+  
+  
+  <div class="container">
+    <div class="left">
+        <h2>Groups</h2>
+        <div v-for="group in groups" :key="group.id" class="list-item">
+          <h3>Group ID: {{ group.id }}</h3>
+          <p><strong>Type:</strong>
+              <span :style="{ color: getGroupColor(group.type) }">{{ group.type }}</span>
+          </p>
+          <p>Chosen Project: {{ group.project.title }}</p>
+          <button @click="openModal(group)">Choose Group</button>
+          <button v-if="group.selected" @click="showGroupMembers(group)">Show Group</button>
+        </div>
+      </div>
+
+    <div class="right">
+      <h2>Projects</h2>
+      <div v-for="project in projects" :key="project.id" class="list-item">
+        <h3 @click="toggleDetails(project.id)"><strong>{{ project.title }}</strong></h3>
+        <div :class="['project-details', { 'open': project.showDetails }]">
+          <p>{{ project.description }}</p>
+          <p><strong>Domain:</strong> {{ project.domain }}</p>
+          <p><strong>Keywords:</strong> {{ project.keywords.join(', ') }}</p>
+          <p><strong>Status:</strong>
+            <span :style="{ color: getStatusColor(project.status) }">{{ project.status }}</span>
+          </p>
+          <button @click="applyToProject(project.id)">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div v-if="isModalOpen" class="modal-overlay">
+    <div class="modal">
+      <h2>Select Group Type</h2>
+      <select v-model="selectedGroupType">
+        <option v-for="group in groupType" :value="group.value" :key="group.value">{{ group.label }}</option>
+      </select>
+
+      <div v-if="selectedGroupType === 'Binome'">
+        <label for="second-member">Choose second member:</label>
+        <input type="text" v-model="secondMemberName" placeholder="Enter name" />
+        <p v-if="secondMemberError" class="error-message">{{ secondMemberError }}</p>
+      </div>
+
+      <div v-if="selectedGroupType === 'Trinome'">
+        <label for="second-member">Choose second member:</label>
+        <input type="text" v-model="secondMemberName" placeholder="Enter name" />
+        <p v-if="secondMemberError" class="error-message">{{ secondMemberError }}</p>
+
+        <label for="third-member">Choose third member:</label>
+        <input type="text" v-model="thirdMemberName" placeholder="Enter name" />
+        <p v-if="thirdMemberError" class="error-message">{{ thirdMemberError }}</p>
+      </div>
+
+      <button @click="saveGroup">Save Group</button>
+      <button @click="closeModal">Close</button>
+    </div>
+  </div>
+
+  <div v-if="isMembersModalOpen" class="modal-overlay">
+    <div class="modal">
+      <h2>Group Members</h2>
+      <ul>
+        <li v-for="member in groupMembers" :key="member.id">{{ member.name }}</li>
+      </ul>
+      <button @click="closeMembersModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+    new Vue({
+      el: '#app',
+      data: {
+        projects: [
+          { id: 1, title: 'Project A', description: 'Description A', domain: 'Domain A', keywords: ['Keyword1', 'Keyword2'], status: 'Open', showDetails: false },
+          { id: 2, title: 'Project B', description: 'Description B', domain: 'Domain B', keywords: ['Keyword3', 'Keyword4'], status: 'Closed', showDetails: false },
+          { id: 3, title: 'Project C', description: 'Description C', domain: 'Domain C', keywords: ['Keyword5', 'Keyword6'], status: 'Open', showDetails: false },
+          { id: 4, title: 'Project D', description: 'Description D', domain: 'Domain D', keywords: ['Keyword7', 'Keyword8'], status: 'Open', showDetails: false },
+        ],
+        groups: [
+          { id: 1, type: 'Binome', project: { title: 'Project A' } },
+          { id: 2, type: 'Monome', project: { title: 'Project B' } },
+          { id: 3, type: 'Trinome', project: { title: 'Project C' } },
+        ],
+        statusOptions: [
+          { value: 'Open', label: 'Open', color: 'green' },
+          { value: 'Closed', label: 'Closed', color: 'red' }
+        ],
+        groupType: [
+          { value: 'Monome', label: 'Monome', color: 'blue' },
+          { value: 'Binome', label: 'Binome', color: '#50E3C2' },
+          { value: 'Trinome', label: 'Trinome', color: '#F39C12' },
+        ],
+        students: [
+          { id: 1, name: 'John Doe' },
+          { id: 2, name: 'Hiba Aimour' },
+          { id: 3, name: 'Billy Bob' }
+        ], 
+        isModalOpen: false,
+        isMembersModalOpen: false,
+        selectedGroupType: 'Monome',
+    secondMemberName: '',
+    thirdMemberName: '',
+    secondMemberError: '',
+    thirdMemberError: '',
+    groupMembers: [],
+      },
+      computed: {
+        filteredStudents() {
+          return this.students.filter(student =>
+            student.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
+        }
+      },
+      methods: {
+        getStatusColor(status) {
+          const statusOption = this.statusOptions.find(option => option.value === status);
+          return statusOption ? statusOption.color : 'black';
+        },
+        getGroupColor(groupType) {
+          const group = this.groupType.find(option => option.value === groupType);
+          return group ? group.color : 'black'; 
+        },
+        toggleDetails(projectId) {
+          const project = this.projects.find(p => p.id === projectId);
+          if (project) {
+            project.showDetails = !project.showDetails;
+            console.log(`Toggled project ${projectId} details: ${project.showDetails}`);
+          }
+        },
+        applyToProject(projectId) {
+          alert('You applied to Project ' + projectId);
+        },
+        shuffle(arr) {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+          }
+          return arr;
+        },
+        openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+      this.resetModal();
+    },
+    resetModal() {
+      this.selectedGroupType = 'Monome';
+      this.secondMemberName = '';
+      this.thirdMemberName = '';
+      this.secondMemberError = '';
+      this.thirdMemberError = '';
+    },
+    openMembersModal() {
+      if (this.groupMembers.length > 0) {
+        this.isMembersModalOpen = true;
+      }
+    },
+    closeMembersModal() {
+      this.isMembersModalOpen = false;
+    },
+    validateMember(name, groupType) {
+      const member = this.students.find(student => student.name.toLowerCase() === name.toLowerCase());
+      if (!member) {
+        return `This user doesn't exist.`;
+      }
+      if (groupType === 'Binome' && this.groupMembers.length === 1) {
+        return 'You already have one member in your group.';
+      }
+      if (groupType === 'Trinome' && this.groupMembers.length === 2) {
+        return 'You already have two members in your group.';
+      }
+      return '';
+    },
+    saveGroup() {
+      if (this.selectedGroupType === 'Monome') {
+        this.groupMembers = [{ name: 'John Doe' }];
+      } else if (this.selectedGroupType === 'Binome') {
+        this.secondMemberError = this.validateMember(this.secondMemberName, 'Binome');
+        if (!this.secondMemberError) {
+          this.groupMembers = [{ name: 'John Doe' }, { name: this.secondMemberName }];
+        }
+      } else if (this.selectedGroupType === 'Trinome') {
+        this.secondMemberError = this.validateMember(this.secondMemberName, 'Trinome');
+        this.thirdMemberError = this.validateMember(this.thirdMemberName, 'Trinome');
+        if (!this.secondMemberError && !this.thirdMemberError) {
+          this.groupMembers = [
+            { name: 'John Doe' },
+            { name: this.secondMemberName },
+            { name: this.thirdMemberName }
+          ];
+        }
+      }
+      if (this.groupMembers.length > 0) {
+        this.closeModal();
+      }
+    }
+
+      },
+      mounted() {
+        this.projects = this.shuffle(this.projects);
+        this.groups = this.shuffle(this.groups);
+      }
+    });
+    particlesJS('particles-js', {
+            particles: {
+              number: { value: 80, density: { enable: true, value_area: 800 } },
+              color: { value: '#7a4e9f' },
+              shape: { type: 'circle' },
+              opacity: { value: 0.5, random: true },
+              size: { value: 3, random: true },
+              line_linked: { enable: true, distance: 150, color: '#7a4e9f' },
+              move: { enable: true, speed: 3 }
+            },
+            interactivity: {
+              events: {
+                onhover: { enable: true, mode: 'repulse' },
+                onclick: { enable: true, mode: 'push' }
+              }
+            }
+    });
+  </script>
+  
+
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Communication</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lora', serif;
+      margin: 0;
+      padding: 0;
+      background-color: white;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .navbar {
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #7a4e9f;
+    }
+
+    .navbar .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7a4e9f;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar li {
+      position: relative;
+    }
+
+    .navbar a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar a.active {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a:hover {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a::before,
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #7a4e9f;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .navbar a::before {
+      left: -10px;
+    }
+
+    .navbar a::after {
+      right: -10px;
+    }
+
+    .navbar a:hover::before,
+    .navbar a:hover::after {
+      opacity: 1;
+      box-shadow: 0 0 5px 1px #7a4e9f, 0 0 10px 2px #7a4e9f, 0 0 15px 3px #7a4e9f;
+    }
+
+   *
+    .navbar .dropdown {
+      position: relative;
+    }
+
+    .navbar .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .navbar .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .left-container {
+      width: 65%;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .right-container {
+      width: 30%;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 15px;
+      max-width: 80%;
+    }
+
+    .received {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+    }
+
+    .sent {
+      background-color: #6a0dad;
+      color: white;
+      align-self: flex-end;
+    }
+
+    .message-input {
+      display: flex;
+      gap: 10px;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 15px;
+      border: 1px solid #ccc;
+    }
+
+    #send-button {
+      padding: 10px 20px;
+      background-color: #6a0dad;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    #send-button:hover {
+      background-color: #5a0b9f;
+    }
+
+    .conversation-history {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .history-btn {
+      background-color: #7a4e9f;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .history-btn:hover {
+      background-color: #5a0b9f;
+    }
+
+    .history-list {
+      display: none;
+      margin-top: 10px;
+      background-color: #e0e0e0;
+      padding: 10px;
+    }
+
+    .error-message {
+      color: red;
+      font-weight: bold;
+    }
+
+    .search-bar {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .messages-container {
+      margin-top: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    .search-bar label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #7a4e9f;
+    }
+
+    .search-bar input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    .search-bar input:focus, select:focus {
+      outline: none;
+      border-color: #7a4e9f;
+    }
+
+    .search-bar {
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+      width: 200px;
+    }
+    #role {
+      width: 200px; 
+    }
+    .dropdown label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #7a4e9f;
+    }
+
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="particles-js"></div>
+  <div class="navbar">
+    <div class="logo">Teacher Dashboard</div>
+    <ul>
+      <li><a href="teacher.html">Home</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="condidates.html">Condidates</a></li>
+      <li><a href="communication.html" class="active">Communication</a></li>
+      <li class="dropdown">
+        <a href="profile.html">Profile</a>
+        <div class="dropdown-content">
+          <a href="../login/login.html">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <div class="left-container">
+      <div class="dropdown">
+        <label class="role" for="role">Select Role for Communication:</label>
+        <select id="role" name="role" onchange="showSearch()">
+          <option value="">--Select Role--</option>
+          <option value="admin">Admin</option>
+          <option value="teacher">Teacher</option>
+          <option value="student">Student</option>
+        </select>
+      </div>
+
+      <div class="search-bar" id="search-bar" style="display:none;">
+        <label for="search">Search by Name:</label>
+        <input type="text" id="search" name="search" placeholder="Enter name" onkeyup="searchPerson()">
+      </div>
+
+      <div class="error-message" id="error-message" style="display:none;">
+        <p>No user found with that name!</p>
+      </div>
+
+      <div class="chat-container" id="chat-container" style="display:none;">
+        <div class="messages">
+          <div class="message received">Hello, how are you?</div>
+          <div class="message sent">I'm good, thanks!</div>
+        </div>
+        <div class="message-input">
+          <textarea id="message-input" placeholder="Type a message..."></textarea>
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-container">
+      <div class="conversation-history">
+        <button class="history-btn" onclick="toggleHistory()">View Conversation History</button>
+        <div class="history-list" id="history-list">
+          <ul>
+            <li>Conversation 1</li>
+            <li>Conversation 2</li>
+            <li>Conversation 3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSearch() {
+    var role = document.getElementById("role").value;
+    var searchBar = document.getElementById("search-bar");
+
+    if (role) {
+      searchBar.style.display = "block";
+    } else {
+      searchBar.style.display = "none";
+    }
+  }
+
+  function searchPerson() {
+    var name = document.getElementById("search").value.trim().toLowerCase();
+    var role = document.getElementById("role").value;
+    var errorMessage = document.getElementById("error-message");
+    var chatContainer = document.getElementById("chat-container");
+
+    if (role === "student" && name === "hiba") {
+      errorMessage.style.display = "none";
+      chatContainer.style.display = "block";  // Show chat when conditions are met
+    } else {
+      errorMessage.style.display = "block";
+      chatContainer.style.display = "none";
+    }
+  }
+
+  function toggleHistory() {
+    var historyList = document.getElementById("history-list");
+    if (historyList.style.display === "none" || historyList.style.display === "") {
+      historyList.style.display = "block";
+    } else {
+      historyList.style.display = "none";
+    }
+  }
+
+  document.getElementById('send-button').addEventListener('click', function() {
+    const message = document.getElementById('message-input').value;
+
+    if (message) {
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message', 'sent');
+      messageContainer.textContent = message;
+
+      document.querySelector('.messages').appendChild(messageContainer);
+      document.getElementById('message-input').value = ''; // Clear input
+    }
+  });
+  particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#7a4e9f' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: true },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: '#7a4e9f' },
+        move: { enable: true, speed: 3 }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: 'repulse' },
+          onclick: { enable: true, mode: 'push' }
+        }
+      }
+    });
+</script>
+
+</body>
+</html>

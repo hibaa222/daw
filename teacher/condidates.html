@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candidates</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lora', serif;
+      margin: 0;
+      padding: 0;
+      background-color: white;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .navbar {
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #7a4e9f;
+    }
+
+    .navbar .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7a4e9f;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar li {
+      position: relative;
+    }
+
+    .navbar a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .navbar a.active {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a:hover {
+      color: #7a4e9f;
+      text-shadow: 0 0 5px #7a4e9f, 0 0 10px #7a4e9f, 0 0 20px #7a4e9f, 0 0 40px #7a4e9f;
+    }
+
+    .navbar a::before,
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #7a4e9f;
+      transition: all 0.3s ease;
+      opacity: 0;
+    }
+
+    .navbar a::before {
+      left: -10px;
+    }
+
+    .navbar a::after {
+      right: -10px;
+    }
+
+    .navbar a:hover::before,
+    .navbar a:hover::after {
+      opacity: 1;
+      box-shadow: 0 0 5px 1px #7a4e9f, 0 0 10px 2px #7a4e9f, 0 0 15px 3px #7a4e9f;
+    }
+
+    .navbar .dropdown {
+      position: relative;
+    }
+
+    .navbar .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    }
+
+    .navbar .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .navbar .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .navbar .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .dashboard-container {
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .student-list, .candidate-list {
+      width: 45%;
+    }
+
+    .student-list {
+      border-right: 2px solid #ddd;
+      padding-right: 20px;
+    }
+
+    .list-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #7a4e9f;
+    }
+
+    .student-card, .candidate-card {
+      background-color: #f5f5f5;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+
+    .student-card h3, .candidate-card h3 {
+      margin-top: 0;
+      color: #7a4e9f;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .accept-btn, .reject-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .accept-btn {
+      background-color: #6c757d;
+    }
+
+    .reject-btn {
+      background-color: #dc3545;
+    }
+
+    .accept-btn:hover {
+      background-color: #5a6268;
+    }
+
+    .reject-btn:hover {
+      background-color: #c82333;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 50%;
+    }
+
+    .close-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background-color: #c82333;
+    }
+
+    .search-filter-container {
+      margin-bottom: 20px;
+    }
+
+    .search-bar, .filter-bar {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      margin-right: 10px;
+      width: 200px;
+    }
+    .collapsible {
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: transparent;
+}
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="particles-js"></div>
+  <div class="navbar">
+    <div class="logo">Teacher Dashboard</div>
+    <ul>
+      <li><a href="teacher.html">Home</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="candidates.html" class="active">Candidates</a></li>
+      <li><a href="communication.html">Communication</a></li>
+      <li class="dropdown">
+        <a href="profile.html">Profile</a>
+        <div class="dropdown-content">
+          <a href="../login/login.html">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="dashboard-container">
+
+    <div class="student-list">
+      <div class="list-title">Student List</div>
+
+      <div class="search-filter-container">
+        <input class="search-bar" v-model="studentSearchQuery" type="text" placeholder="Search students by name" />
+      </div>
+
+      <div class="student-card" v-for="student in filteredStudents" :key="student.id" @click="showModal(student)" >
+        <button type="button" class="collapsible"><h3>{{ student.id }} • {{ student.name }}</h3></button>
+<div class="content">
+  <p>{{ student.skills }}</p>
+</div>
+      
+      </div>
+    </div>
+
+    <div class="candidate-list">
+      <div class="list-title">Candidate List</div>
+
+      <div class="search-filter-container">
+        <input class="search-bar" v-model="searchQuery" type="text" placeholder="Search candidates by name" />
+        <select class="filter-bar" v-model="groupFilter">
+          <option value="">Filter by group</option>
+          <option value="monome">Monome</option>
+          <option value="binome">Binome</option>
+          <option value="trinome">Trinome</option>
+        </select>
+      </div>
+
+      <div class="candidate-card" v-for="candidate in filteredCandidates" :key="candidate.groupID">
+        <h3>Group Type: {{ candidate.group }}</h3>
+        <p><strong>Project:</strong> {{ candidate.project }}</p>
+        <p><strong>Members:</strong></p>
+        <ul>
+          <li v-for="member in candidate.members" :key="member.id">
+            {{ member.name }} <strong>|</strong> {{ member.skills }}
+          </li>
+        </ul>
+        <div class="button-group">
+          <button class="accept-btn" @click="acceptCandidate(candidate)">Accept</button>
+          <button class="reject-btn" @click="rejectCandidate(candidate)">Reject</button>
+        </div>
+      </div>
+      
+    </div>
+    
+  </div>
+
+
+</div>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+        students: [
+        { id: 1, name: 'John Doe', skills: 'JavaScript, HTML', groupID: 1, project: 'E-commerce Website' },
+        { id: 2, name: 'Jane Smith', skills: 'Python, Django', groupID:3, project: 'Machine Learning Model' },
+        { id: 3, name: 'Samuel Green', skills: 'React, Node.js', groupID: 4, project: 'Social Media App' },
+        { id: 4, name: 'Alice Green', skills: 'Vue.js, Node.js', groupID: 4, project: 'Machine Learning Model' },
+        { id: 5, name: 'Dylan Brooks', skills: 'JavaScript, React', groupID: 4, project: 'E-commerce Website' },
+        { id: 6, name: 'Olivia Chen', skills: 'Node.js, Express', groupID: 3, project: 'Social Media App' },
+        { id: 7, name: 'Aimour hiba', skills: 'JavaScript, HTML', groupID: 2, project: 'E-commerce Website' },
+      ],
+      candidates: [
+      {
+        groupID: 1,
+        group: 'monome',
+        project: 'E-commerce',
+        members: [
+          { id: 1, name: 'John Doe', skills: 'JavaScript, HTML', experience: '3 years' }
+        ]
+      },
+      {
+        groupID: 2,
+        group: 'monome',
+        project: 'E-commerce',
+        members: [
+          { id: 7, name: 'Aimour hiba', skills: 'JavaScript, HTML', experience: '3 years' }
+        ]
+      },
+      {
+        groupID: 3,
+        group: 'binome',
+        project: 'Social Media',
+        members: [
+          { id: 2, name: 'Jane Smith', skills: 'Python, Django', experience: '2 years' },
+          { id: 3, name: 'Olivia Chan', skills: 'Node.js, Express', experience: '1 year' }
+        ]
+      },
+      {
+        groupID: 4,
+        group: 'trinome',
+        project: 'Machine Learning',
+        members: [
+          { id: 4, name: 'Samuel Green', skills: 'React, Node.js', experience: '4 years' },
+          { id: 5, name: 'Alice Green', skills: 'Vue.js, Node.js', experience: '2 years' },
+          { id: 6, name: 'Dylan Brooks', skills: 'JavaScript, React', experience: '1 year' }
+        ]
+      }
+    ],
+      searchQuery: '',
+      groupFilter: '',
+      studentSearchQuery: '',
+    },
+    computed: {
+        groupedCandidates() {
+        const groups = {};
+
+        this.students.forEach(student => {
+          if (!groups[student.group]) {
+            groups[student.group] = {
+              groupName: student.group,
+              project: student.project,
+              members: []
+            };
+          }
+          groups[student.group].members.push(student);
+        });
+
+        return Object.values(groups);
+      },
+      filteredStudents() {
+        let filtered = this.students;
+
+        if (this.studentSearchQuery) {
+          filtered = filtered.filter(student =>
+            student.name.toLowerCase().includes(this.studentSearchQuery.toLowerCase())
+          );
+        }
+
+        return filtered;
+      },
+      filteredCandidates() {
+        let filtered = this.candidates;
+
+        if (this.groupFilter) {
+          filtered = filtered.filter(candidate => candidate.group === this.groupFilter);
+        }
+
+        return this.candidates.filter(candidate => {
+          const matchesGroup = this.groupFilter
+            ? candidate.group === this.groupFilter
+            : true;
+
+          const matchesSearch = candidate.members.some(member =>
+            member.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
+
+          return matchesGroup && matchesSearch;
+        });
+
+        return filtered;
+      }
+    },
+    methods: {
+      acceptCandidate(candidate) {
+        alert(`Accepted ${candidate.name}`);
+        this.candidates = this.candidates.filter(c => c !== candidate);
+      },
+      rejectCandidate(candidate) {
+        alert(`Rejected ${candidate.name}`);
+        this.candidates = this.candidates.filter(c => c !== candidate);
+      }
+    }
+  });
+  src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"
+  var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#7a4e9f' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: true },
+        size: { value: 3, random: true },
+        line_linked: { enable: true, distance: 150, color: '#7a4e9f' },
+        move: { enable: true, speed: 3 }
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: true, mode: 'repulse' },
+          onclick: { enable: true, mode: 'push' }
+        }
+      }
+    });
+
+</script>
+
+</body>
+</html>
